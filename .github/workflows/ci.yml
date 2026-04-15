@@ -24,7 +24,8 @@ jobs:
           pip install --upgrade pip
           pip install requests pandas pyarrow duckdb xgboost scikit-learn \
                       shap optuna mlflow fastapi uvicorn httpx \
-                      streamlit plotly pytest pytest-mock python-dotenv
+                      streamlit plotly pytest pytest-mock python-dotenv \
+                      prophet scipy
 
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
