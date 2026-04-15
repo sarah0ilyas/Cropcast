@@ -10,8 +10,7 @@
 
 > A production-grade ML platform that nowcasts current-year crop yields and forecasts 5 years ahead across 13 countries and 6 crops — automatically rolling forward as new FAO data is released.
 
-**Live demo:** [https://cropcast.sarahilyas.dev](https://cropcast.sarahilyas.dev)
-**API docs:** [https://cropcast.sarahilyas.dev/api/docs](https://cropcast.sarahilyas.dev/api/docs)
+**Live demo:** [https://cropcast.sarahilyas.dev](https://cropcast.sarahilyas.dev)  
 **GitHub:** [https://github.com/sarah0ilyas/Cropcast](https://github.com/sarah0ilyas/Cropcast)
 
 ---
@@ -28,36 +27,114 @@ FAO crop production data lags 12–18 months behind reality. By the time officia
 
 ---
 
-## Architecture
+## Pipeline Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Ingestion     │    │  Transforms     │    │   ML Models     │
-│                 │───▶│                 │───▶│                 │
-│ FAO STAT CSV    │    │ DuckDB SQL      │    │ XGBoost x6      │
-│ Open-Meteo API  │    │ Feature eng.    │    │ Prophet x6      │
-│ USDA NASS       │    │ 45 features     │    │ Ensemble blend  │
-│ 13 countries    │    │ Parquet lake    │    │ Walk-forward CV │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                       │
-┌─────────────────┐    ┌─────────────────┐            │
-│   Dashboard     │    │   REST API      │            │
-│                 │◀───│                 │◀───────────┘
-│ Streamlit       │    │ FastAPI         │
-│ Forecast charts │    │ 5 endpoints     │
-│ Risk heatmap    │    │ Swagger docs    │
-│ SHAP plots      │    │ CORS enabled    │
-│ AWS + SSL       │    │                 │
-└─────────────────┘    └─────────────────┘
-
-┌─────────────────┐    ┌─────────────────┐
-│ Drift Detection │    │   CI/CD         │
-│                 │    │                 │
-│ KS test         │    │ GitHub Actions  │
-│ PSI index       │    │ 7 import checks │
-│ MAE degradation │    │ Runs on push    │
-│ JSON reports    │    │                 │
-└─────────────────┘    └─────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                         STAGE 1 — INGESTION                          │
+│                                                                      │
+│  FAO STAT Bulk CSV          Open-Meteo Archive API                   │
+│  ├── 13 countries           ├── 12 production regions                │
+│  ├── 6 crops                ├── Daily weather 2000–2026              │
+│  ├── 2000–2024              ├── Temp, precip, ET0                    │
+│  └── 5,256 rows             └── 460,652 rows                         │
+│                                                                      │
+│  base.py — retry logic, schema validation, Parquet save              │
+└─────────────────────────────┬────────────────────────────────────────┘
+                              │ raw Parquet files
+                              ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                        STAGE 2 — TRANSFORMS                          │
+│                                                                      │
+│  transform.py (DuckDB in-memory SQL)                                 │
+│  ├── Pivot FAO long → wide                                           │
+│  ├── Aggregate daily weather → annual growing-season features        │
+│  ├── Left join FAO + weather on (country, year)                      │
+│  └── analytical_base.parquet (1,723 rows, 14 cols)                   │
+│                                                                      │
+│  features.py                                                         │
+│  ├── Lag features: yield lag 1, 2, 3                                 │
+│  ├── Rolling averages: 3-year, 5-year                                │
+│  ├── YoY change: yield, production, area, weather                    │
+│  ├── Weather anomalies: z-scores vs country mean                     │
+│  ├── Trend features: years since 2000, crop rank                     │
+│  └── features.parquet (1,723 rows, 45 cols)                          │
+└─────────────────────────────┬────────────────────────────────────────┘
+                              │ features.parquet
+                              ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                        STAGE 3 — ML TRAINING                         │
+│                                                                      │
+│  train.py                                                            │
+│  ├── Walk-forward backtesting (never random splits)                  │
+│  ├── Optuna hyperparameter tuning (30 trials per crop)               │
+│  ├── XGBoost trained on 23 features                                  │
+│  ├── Prophet trained per country time series                         │
+│  ├── Bootstrap prediction intervals (90% confidence)                 │
+│  ├── SHAP explainability plots                                       │
+│  ├── MLflow experiment tracking                                      │
+│  └── 6 models saved → models/saved/xgb_*.json                       │
+│                                                                      │
+│  Results: R² 0.89–0.97 | Backtest MAPE 4.2%–9.7%                    │
+└─────────────────────────────┬────────────────────────────────────────┘
+                              │ trained models
+                              ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                      STAGE 4 — FORECAST ENGINE                       │
+│                                                                      │
+│  engine.py                                                           │
+│  ├── Auto-detects latest FAO year (currently 2024)                   │
+│  ├── Nowcasts 2025 — FAO hasn't released yet                         │
+│  ├── Forecasts 2026–2029 (5-year horizon)                            │
+│  ├── XGBoost + Prophet ensemble                                      │
+│  │   └── XGBoost weight decreases for longer horizons                │
+│  ├── Prediction intervals widen: 90% → 58% confidence by 2029       │
+│  ├── Rolling window auto-advances when new FAO data ingested         │
+│  └── forecasts.parquet (355 forecasts, 13 countries × 6 crops)      │
+│                                                                      │
+│  drift/detector.py                                                   │
+│  ├── KS test — detects feature distribution shifts                   │
+│  ├── PSI — quantifies magnitude (>0.2 = significant)                 │
+│  ├── MAE degradation — flags model performance decay                 │
+│  └── JSON drift reports saved to drift_reports/                      │
+└──────────────┬──────────────────────────┬───────────────────────────┘
+               │                          │
+               ▼                          ▼
+┌──────────────────────┐    ┌─────────────────────────────────────────┐
+│   STAGE 5 — API      │    │         STAGE 5 — DASHBOARD             │
+│                      │    │                                         │
+│  FastAPI             │    │  Streamlit                              │
+│  ├── /forecast       │    │  ├── Forecast view                      │
+│  ├── /nowcast        │    │  │   ├── 5-year rolling chart           │
+│  ├── /history        │    │  │   ├── Prediction interval bands      │
+│  ├── /combined       │    │  │   ├── Nowcast by country             │
+│  └── /risk           │    │  │   └── 5-year summary table           │
+│                      │    │  ├── Historical view                    │
+│  Swagger docs /docs  │    │  │   ├── Yield trends 2000–2024         │
+│                      │    │  │   ├── Production bar chart           │
+│                      │    │  │   └── YoY change boxplot             │
+│                      │    │  └── Risk view                          │
+│                      │    │      ├── Risk score heatmap             │
+│                      │    │      └── SHAP feature importance        │
+└──────────────────────┘    └─────────────────────────────────────────┘
+               │                          │
+               └──────────────┬───────────┘
+                              ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                       DEPLOYMENT                                     │
+│                                                                      │
+│  AWS EC2 t2.micro (eu-west-1)                                        │
+│  ├── Nginx reverse proxy                                             │
+│  ├── Let's Encrypt SSL (auto-renews)                                 │
+│  ├── Crontab @reboot auto-start                                      │
+│  └── https://cropcast.sarahilyas.dev                                 │
+│                                                                      │
+│  GitHub Actions CI                                                   │
+│  └── Import checks on every push to main                            │
+│                                                                      │
+│  Docker + docker-compose                                             │
+│  └── Containerised for reproducible deployment                       │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -73,7 +150,7 @@ FAO crop production data lags 12–18 months behind reality. By the time officia
 | Avocados | 0.9056 | 5.9% | 0.41 MT/HA | 65.9% |
 | Blueberries | 0.8920 | 7.6% | 1.12 MT/HA | 84.4% |
 
-All models validated using **walk-forward backtesting** — never random splits. The backtest MAE reflects true out-of-sample performance on genuinely future years.
+All models validated using **walk-forward backtesting** — never random splits. Backtest MAPE reflects true out-of-sample performance on genuinely future years.
 
 ---
 
@@ -89,10 +166,10 @@ XGBoost captures non-linear feature interactions and dominates short-horizon pre
 At under 200K rows, Spark adds infrastructure overhead with no performance benefit. DuckDB executes columnar SQL in-memory in under a second with zero setup — right tool for the right scale.
 
 **Why nowcast instead of just forecast?**
-FAO data lags 12–18 months. By the time 2025 data is officially published it will be late 2026. The nowcast estimates the current unreported year using 2024 lag features and 2025–2026 weather observations — genuinely useful for procurement teams who cannot wait 18 months.
+FAO data lags 12–18 months. The nowcast estimates the current unreported year using 2024 lag features and 2025–2026 weather observations — genuinely useful for procurement teams who cannot wait 18 months for official statistics.
 
 **Why rolling forecast horizon?**
-The forecast window auto-advances when new FAO data is ingested. No hardcoded years anywhere in the codebase — `latest_year = df["year"].max()` drives everything downstream.
+The forecast window auto-advances when new FAO data is ingested. No hardcoded years anywhere — `latest_year = df["year"].max()` drives everything downstream.
 
 ---
 
@@ -101,10 +178,9 @@ The forecast window auto-advances when new FAO data is ingested. No hardcoded ye
 | Source | Coverage | Records |
 |--------|----------|---------|
 | FAO STAT bulk CSV | 13 countries, 6 crops, 2000–2024 | 5,256 rows |
-| Open-Meteo archive | 12 production regions, daily | 460,652 rows |
-| USDA NASS | US domestic stats + prices | via API |
+| Open-Meteo archive | 12 production regions, daily 2000–2026 | 460,652 rows |
 
-**Total data lake: 465,908 rows of real agricultural data**
+**Total: 465,908 rows of real agricultural data**
 
 ---
 
@@ -119,41 +195,6 @@ The forecast window auto-advances when new FAO data is ingested. No hardcoded ye
 
 ---
 
-## Project Structure
-
-```
-cropcast/
-├── cropcast/
-│   ├── config/settings.py        # 15 countries, 6 crops, all config
-│   ├── ingestion/
-│   │   ├── base.py               # Retry, logging, Parquet save
-│   │   ├── fao_ingester.py       # FAO bulk CSV connector
-│   │   └── weather_ingester.py   # Open-Meteo connector
-│   ├── transforms/
-│   │   ├── transform.py          # DuckDB cleaning + joining
-│   │   └── features.py           # 45 ML features engineered
-│   ├── models/
-│   │   ├── train.py              # XGBoost + walk-forward + SHAP
-│   │   ├── saved/                # 6 trained XGBoost models
-│   │   └── plots/                # SHAP importance plots
-│   ├── forecast/
-│   │   └── engine.py             # Rolling 5-year forecast engine
-│   ├── drift/
-│   │   └── detector.py           # KS + PSI + MAE drift detection
-│   ├── api/
-│   │   ├── main.py               # FastAPI app
-│   │   └── routers/
-│   │       └── forecast_router.py # Forecast + risk endpoints
-│   └── dashboard/
-│       └── app.py                # Streamlit forecast-first UI
-├── .github/workflows/ci.yml      # GitHub Actions CI
-├── Dockerfile
-├── docker-compose.yml
-└── requirements.txt
-```
-
----
-
 ## Quickstart
 
 ```bash
@@ -163,7 +204,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 export PYTHONPATH=$(pwd)
 
-# 1. Ingest data (download FAO bulk CSV first)
+# 1. Ingest data (download FAO bulk CSV first from FAO STAT)
 python3 cropcast/ingestion/weather_ingester.py
 python3 -c "
 from cropcast.ingestion.fao_ingester import FAOIngester
@@ -174,10 +215,10 @@ FAOIngester().run(csv_path='path/to/fao_bulk.csv')
 python3 cropcast/transforms/transform.py
 python3 cropcast/transforms/features.py
 
-# 3. Train models
+# 3. Train models (all 6 crops)
 python3 cropcast/models/train.py --trials 30
 
-# 4. Generate forecasts
+# 4. Generate rolling 5-year forecasts
 python3 cropcast/forecast/engine.py
 
 # 5. Check for drift
@@ -201,14 +242,15 @@ CropCast monitors two types of drift automatically:
 **Model drift** — MAE on recent data vs reference period. If degradation exceeds 15% threshold, retraining is recommended.
 
 ```bash
-python3 cropcast/drift/detector.py --crop Grapes
+python3 cropcast/drift/detector.py           # all crops
+python3 cropcast/drift/detector.py --crop Grapes  # single crop
 ```
 
 ---
 
 ## Related Projects
 
-- **Wild Blueberry Yield Regression** — Single-crop regression model, the origin of this project. Deployed on Streamlit + AWS.
+- **Wild Blueberry Yield Regression** — Single-crop regression model. Deployed on Streamlit + AWS.
 - **Live Fraud Detection System** — Real-time ML inference pipeline for financial transaction classification.
 
 ---
@@ -217,4 +259,4 @@ python3 cropcast/drift/detector.py --crop Grapes
 
 Built by **Sarah Ilyas** — ML Engineer with domain expertise in global agricultural commodities, including professional work on the Global Grape Report (GGR).
 
-[LinkedIn](https://linkedin.com/in/sarahilyas) · [GitHub](https://github.com/sarah0ilyas) · [sarahilyas.dev](https://sarahilyas.dev)
+[LinkedIn](https://linkedin.com/in/sarahilyas) · [GitHub](https://github.com/sarah0ilyas) · [cropcast.sarahilyas.dev](https://cropcast.sarahilyas.dev)
