@@ -1,0 +1,81 @@
+name: CropCast CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install requests pandas pyarrow duckdb xgboost scikit-learn \
+                      shap optuna mlflow fastapi uvicorn httpx \
+                      streamlit plotly pytest pytest-mock python-dotenv
+
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
+      - name: Run config tests
+        run: |
+          python3 -c "
+          from cropcast.config.settings import config
+          assert len(config.fao.area_codes) == 15
+          assert len(config.fao.crops) == 6
+          print('Config OK')
+          "
+
+      - name: Run ingestion tests
+        run: |
+          python3 -c "
+          from cropcast.ingestion.base import BaseIngester
+          from cropcast.ingestion.fao_ingester import FAOIngester
+          from cropcast.ingestion.weather_ingester import WeatherIngester
+          print('Ingestion imports OK')
+          "
+
+      - name: Run transform tests
+        run: |
+          python3 -c "
+          from cropcast.transforms.transform import get_connection, clean_fao
+          from cropcast.transforms.features import build_features
+          print('Transform imports OK')
+          "
+
+      - name: Run API tests
+        run: |
+          python3 -c "
+          from cropcast.api.main import app
+          from cropcast.api.routers.forecast_router import router
+          print('API imports OK')
+          "
+
+      - name: Run forecast engine tests
+        run: |
+          python3 -c "
+          from cropcast.forecast.engine import build_forecast_row, prophet_trend_forecast
+          print('Forecast engine imports OK')
+          "
+
+      - name: Run drift detector tests
+        run: |
+          python3 -c "
+          from cropcast.drift.detector import get_reference_current, get_features
+          print('Drift detector imports OK')
+          "
+
+      - name: All checks passed
+        run: echo "CropCast CI passed successfully"

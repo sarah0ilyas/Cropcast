@@ -1,0 +1,187 @@
+{
+  "crop": "Strawberries",
+  "data_drift": {
+    "crop": "Strawberries",
+    "drift_detected": true,
+    "drift_share": 0.913,
+    "n_drifted_cols": 21,
+    "drifted_features": [
+      "yield_lag_1",
+      "yield_lag_2",
+      "yield_lag_3",
+      "yield_rolling_3y",
+      "yield_rolling_5y",
+      "area_ha",
+      "area_lag_1",
+      "area_ha_yoy_pct",
+      "avg_temp_max_c",
+      "avg_temp_min_c",
+      "total_precip_mm",
+      "avg_et0_mm",
+      "growing_season_temp_max_c",
+      "growing_season_temp_min_c",
+      "growing_season_precip_mm",
+      "avg_temp_max_c_anomaly",
+      "total_precip_mm_anomaly",
+      "growing_season_temp_max_c_anomaly",
+      "growing_season_precip_mm_anomaly",
+      "years_since_2000",
+      "crop_year_rank"
+    ],
+    "feature_results": {
+      "yield_lag_1": {
+        "ks_statistic": 0.189,
+        "ks_pvalue": 0.0262,
+        "psi": 0.1971,
+        "drifted": true
+      },
+      "yield_lag_2": {
+        "ks_statistic": 0.2234,
+        "ks_pvalue": 0.0047,
+        "psi": 0.2036,
+        "drifted": true
+      },
+      "yield_lag_3": {
+        "ks_statistic": 0.2578,
+        "ks_pvalue": 0.0006,
+        "psi": 0.3242,
+        "drifted": true
+      },
+      "yield_rolling_3y": {
+        "ks_statistic": 0.2533,
+        "ks_pvalue": 0.0008,
+        "psi": 0.5089,
+        "drifted": true
+      },
+      "yield_rolling_5y": {
+        "ks_statistic": 0.2707,
+        "ks_pvalue": 0.0003,
+        "psi": 0.4363,
+        "drifted": true
+      },
+      "yield_mt_ha_yoy_pct": {
+        "ks_statistic": 0.1054,
+        "ks_pvalue": 0.4937,
+        "psi": 0.1795,
+        "drifted": false
+      },
+      "area_ha": {
+        "ks_statistic": 0.2009,
+        "ks_pvalue": 0.0151,
+        "psi": 2.4156,
+        "drifted": true
+      },
+      "area_lag_1": {
+        "ks_statistic": 0.1755,
+        "ks_pvalue": 0.0473,
+        "psi": 2.3359,
+        "drifted": true
+      },
+      "area_ha_yoy_pct": {
+        "ks_statistic": 0.1858,
+        "ks_pvalue": 0.0301,
+        "psi": 0.6532,
+        "drifted": true
+      },
+      "avg_temp_max_c": {
+        "ks_statistic": 0.2702,
+        "ks_pvalue": 0.0003,
+        "psi": 0.6661,
+        "drifted": true
+      },
+      "avg_temp_min_c": {
+        "ks_statistic": 0.2998,
+        "ks_pvalue": 0.0,
+        "psi": 1.4238,
+        "drifted": true
+      },
+      "total_precip_mm": {
+        "ks_statistic": 0.2448,
+        "ks_pvalue": 0.0014,
+        "psi": 0.3139,
+        "drifted": true
+      },
+      "avg_et0_mm": {
+        "ks_statistic": 0.2491,
+        "ks_pvalue": 0.0011,
+        "psi": 0.502,
+        "drifted": true
+      },
+      "growing_season_temp_max_c": {
+        "ks_statistic": 0.2616,
+        "ks_pvalue": 0.0005,
+        "psi": 0.5693,
+        "drifted": true
+      },
+      "growing_season_temp_min_c": {
+        "ks_statistic": 0.3139,
+        "ks_pvalue": 0.0,
+        "psi": 1.4807,
+        "drifted": true
+      },
+      "growing_season_precip_mm": {
+        "ks_statistic": 0.1933,
+        "ks_pvalue": 0.0215,
+        "psi": 0.6672,
+        "drifted": true
+      },
+      "avg_temp_max_c_anomaly": {
+        "ks_statistic": 0.4373,
+        "ks_pvalue": 0.0,
+        "psi": 0.8597,
+        "drifted": true
+      },
+      "total_precip_mm_anomaly": {
+        "ks_statistic": 0.3399,
+        "ks_pvalue": 0.0,
+        "psi": 0.6935,
+        "drifted": true
+      },
+      "growing_season_temp_max_c_anomaly": {
+        "ks_statistic": 0.4518,
+        "ks_pvalue": 0.0,
+        "psi": 1.7469,
+        "drifted": true
+      },
+      "growing_season_precip_mm_anomaly": {
+        "ks_statistic": 0.2793,
+        "ks_pvalue": 0.0002,
+        "psi": 0.4769,
+        "drifted": true
+      },
+      "years_since_2000": {
+        "ks_statistic": 1.0,
+        "ks_pvalue": 0.0,
+        "psi": 29.6797,
+        "drifted": true
+      },
+      "crop_year_rank": {
+        "ks_statistic": 0.9231,
+        "ks_pvalue": 0.0,
+        "psi": 23.1672,
+        "drifted": true
+      },
+      "country_encoded": {
+        "ks_statistic": 0.0298,
+        "ks_pvalue": 1.0,
+        "psi": 0.0275,
+        "drifted": false
+      }
+    },
+    "reference_period": "2000-2018",
+    "current_period": "2019-2024",
+    "timestamp": "2026-04-15T08:50:12.010577"
+  },
+  "model_drift": {
+    "crop": "Strawberries",
+    "drift_detected": true,
+    "reference_mae": 0.0698,
+    "current_mae": 1.267,
+    "degradation_pct": 1714.82,
+    "threshold_pct": 15.0,
+    "action_required": true,
+    "timestamp": "2026-04-15T08:50:12.025951"
+  },
+  "action_required": true,
+  "timestamp": "2026-04-15T08:50:12.026108"
+}

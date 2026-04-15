@@ -1,0 +1,173 @@
+{
+  "crop": "Citrus Fruit, Total",
+  "drift_detected": true,
+  "drift_share": 0.957,
+  "n_drifted_cols": 22,
+  "drifted_features": [
+    "yield_lag_1",
+    "yield_lag_2",
+    "yield_lag_3",
+    "yield_rolling_3y",
+    "yield_rolling_5y",
+    "yield_mt_ha_yoy_pct",
+    "area_ha",
+    "area_lag_1",
+    "area_ha_yoy_pct",
+    "avg_temp_max_c",
+    "avg_temp_min_c",
+    "total_precip_mm",
+    "avg_et0_mm",
+    "growing_season_temp_max_c",
+    "growing_season_temp_min_c",
+    "growing_season_precip_mm",
+    "avg_temp_max_c_anomaly",
+    "total_precip_mm_anomaly",
+    "growing_season_temp_max_c_anomaly",
+    "growing_season_precip_mm_anomaly",
+    "years_since_2000",
+    "crop_year_rank"
+  ],
+  "feature_results": {
+    "yield_lag_1": {
+      "ks_statistic": 0.2227,
+      "ks_pvalue": 0.0046,
+      "psi": 2.4465,
+      "drifted": true
+    },
+    "yield_lag_2": {
+      "ks_statistic": 0.2854,
+      "ks_pvalue": 0.0001,
+      "psi": 2.5111,
+      "drifted": true
+    },
+    "yield_lag_3": {
+      "ks_statistic": 0.2969,
+      "ks_pvalue": 0.0,
+      "psi": 2.5541,
+      "drifted": true
+    },
+    "yield_rolling_3y": {
+      "ks_statistic": 0.2848,
+      "ks_pvalue": 0.0001,
+      "psi": 2.5056,
+      "drifted": true
+    },
+    "yield_rolling_5y": {
+      "ks_statistic": 0.2807,
+      "ks_pvalue": 0.0001,
+      "psi": 3.1671,
+      "drifted": true
+    },
+    "yield_mt_ha_yoy_pct": {
+      "ks_statistic": 0.1545,
+      "ks_pvalue": 0.1052,
+      "psi": 0.5008,
+      "drifted": true
+    },
+    "area_ha": {
+      "ks_statistic": 0.1498,
+      "ks_pvalue": 0.1253,
+      "psi": 3.9352,
+      "drifted": true
+    },
+    "area_lag_1": {
+      "ks_statistic": 0.1741,
+      "ks_pvalue": 0.0482,
+      "psi": 3.8675,
+      "drifted": true
+    },
+    "area_ha_yoy_pct": {
+      "ks_statistic": 0.166,
+      "ks_pvalue": 0.0673,
+      "psi": 0.7144,
+      "drifted": true
+    },
+    "avg_temp_max_c": {
+      "ks_statistic": 0.2328,
+      "ks_pvalue": 0.0026,
+      "psi": 0.5664,
+      "drifted": true
+    },
+    "avg_temp_min_c": {
+      "ks_statistic": 0.2024,
+      "ks_pvalue": 0.0132,
+      "psi": 1.2307,
+      "drifted": true
+    },
+    "total_precip_mm": {
+      "ks_statistic": 0.222,
+      "ks_pvalue": 0.0048,
+      "psi": 0.3006,
+      "drifted": true
+    },
+    "avg_et0_mm": {
+      "ks_statistic": 0.2099,
+      "ks_pvalue": 0.0091,
+      "psi": 0.1973,
+      "drifted": true
+    },
+    "growing_season_temp_max_c": {
+      "ks_statistic": 0.2193,
+      "ks_pvalue": 0.0055,
+      "psi": 0.4286,
+      "drifted": true
+    },
+    "growing_season_temp_min_c": {
+      "ks_statistic": 0.2699,
+      "ks_pvalue": 0.0003,
+      "psi": 1.3653,
+      "drifted": true
+    },
+    "growing_season_precip_mm": {
+      "ks_statistic": 0.1559,
+      "ks_pvalue": 0.1,
+      "psi": 0.3136,
+      "drifted": true
+    },
+    "avg_temp_max_c_anomaly": {
+      "ks_statistic": 0.4211,
+      "ks_pvalue": 0.0,
+      "psi": 0.8708,
+      "drifted": true
+    },
+    "total_precip_mm_anomaly": {
+      "ks_statistic": 0.3428,
+      "ks_pvalue": 0.0,
+      "psi": 0.6905,
+      "drifted": true
+    },
+    "growing_season_temp_max_c_anomaly": {
+      "ks_statistic": 0.4521,
+      "ks_pvalue": 0.0,
+      "psi": 1.7657,
+      "drifted": true
+    },
+    "growing_season_precip_mm_anomaly": {
+      "ks_statistic": 0.2827,
+      "ks_pvalue": 0.0001,
+      "psi": 0.4453,
+      "drifted": true
+    },
+    "years_since_2000": {
+      "ks_statistic": 1.0,
+      "ks_pvalue": 0.0,
+      "psi": 29.8566,
+      "drifted": true
+    },
+    "crop_year_rank": {
+      "ks_statistic": 1.0,
+      "ks_pvalue": 0.0,
+      "psi": 29.8566,
+      "drifted": true
+    },
+    "country_encoded": {
+      "ks_statistic": 0.0,
+      "ks_pvalue": 1.0,
+      "psi": 0.0,
+      "drifted": false
+    }
+  },
+  "reference_period": "2000-2018",
+  "current_period": "2019-2024",
+  "timestamp": "2026-04-15T08:50:11.950531"
+}

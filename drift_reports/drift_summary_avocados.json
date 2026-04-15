@@ -1,0 +1,189 @@
+{
+  "crop": "Avocados",
+  "data_drift": {
+    "crop": "Avocados",
+    "drift_detected": true,
+    "drift_share": 1.0,
+    "n_drifted_cols": 23,
+    "drifted_features": [
+      "yield_lag_1",
+      "yield_lag_2",
+      "yield_lag_3",
+      "yield_rolling_3y",
+      "yield_rolling_5y",
+      "yield_mt_ha_yoy_pct",
+      "area_ha",
+      "area_lag_1",
+      "area_ha_yoy_pct",
+      "avg_temp_max_c",
+      "avg_temp_min_c",
+      "total_precip_mm",
+      "avg_et0_mm",
+      "growing_season_temp_max_c",
+      "growing_season_temp_min_c",
+      "growing_season_precip_mm",
+      "avg_temp_max_c_anomaly",
+      "total_precip_mm_anomaly",
+      "growing_season_temp_max_c_anomaly",
+      "growing_season_precip_mm_anomaly",
+      "years_since_2000",
+      "crop_year_rank",
+      "country_encoded"
+    ],
+    "feature_results": {
+      "yield_lag_1": {
+        "ks_statistic": 0.2078,
+        "ks_pvalue": 0.0243,
+        "psi": 2.6967,
+        "drifted": true
+      },
+      "yield_lag_2": {
+        "ks_statistic": 0.2686,
+        "ks_pvalue": 0.0013,
+        "psi": 1.9703,
+        "drifted": true
+      },
+      "yield_lag_3": {
+        "ks_statistic": 0.2652,
+        "ks_pvalue": 0.0016,
+        "psi": 1.834,
+        "drifted": true
+      },
+      "yield_rolling_3y": {
+        "ks_statistic": 0.2692,
+        "ks_pvalue": 0.0013,
+        "psi": 1.4895,
+        "drifted": true
+      },
+      "yield_rolling_5y": {
+        "ks_statistic": 0.3094,
+        "ks_pvalue": 0.0001,
+        "psi": 1.6991,
+        "drifted": true
+      },
+      "yield_mt_ha_yoy_pct": {
+        "ks_statistic": 0.0887,
+        "ks_pvalue": 0.7959,
+        "psi": 0.5523,
+        "drifted": true
+      },
+      "area_ha": {
+        "ks_statistic": 0.233,
+        "ks_pvalue": 0.0079,
+        "psi": 2.3113,
+        "drifted": true
+      },
+      "area_lag_1": {
+        "ks_statistic": 0.2482,
+        "ks_pvalue": 0.0038,
+        "psi": 1.9579,
+        "drifted": true
+      },
+      "area_ha_yoy_pct": {
+        "ks_statistic": 0.2006,
+        "ks_pvalue": 0.0326,
+        "psi": 0.6983,
+        "drifted": true
+      },
+      "avg_temp_max_c": {
+        "ks_statistic": 0.1541,
+        "ks_pvalue": 0.1727,
+        "psi": 0.3016,
+        "drifted": true
+      },
+      "avg_temp_min_c": {
+        "ks_statistic": 0.1392,
+        "ks_pvalue": 0.2678,
+        "psi": 1.7232,
+        "drifted": true
+      },
+      "total_precip_mm": {
+        "ks_statistic": 0.2247,
+        "ks_pvalue": 0.0116,
+        "psi": 0.6436,
+        "drifted": true
+      },
+      "avg_et0_mm": {
+        "ks_statistic": 0.0981,
+        "ks_pvalue": 0.6883,
+        "psi": 1.5269,
+        "drifted": true
+      },
+      "growing_season_temp_max_c": {
+        "ks_statistic": 0.199,
+        "ks_pvalue": 0.0348,
+        "psi": 0.6188,
+        "drifted": true
+      },
+      "growing_season_temp_min_c": {
+        "ks_statistic": 0.1402,
+        "ks_pvalue": 0.2603,
+        "psi": 2.0293,
+        "drifted": true
+      },
+      "growing_season_precip_mm": {
+        "ks_statistic": 0.151,
+        "ks_pvalue": 0.1897,
+        "psi": 0.8831,
+        "drifted": true
+      },
+      "avg_temp_max_c_anomaly": {
+        "ks_statistic": 0.4201,
+        "ks_pvalue": 0.0,
+        "psi": 1.9439,
+        "drifted": true
+      },
+      "total_precip_mm_anomaly": {
+        "ks_statistic": 0.2344,
+        "ks_pvalue": 0.0074,
+        "psi": 1.2091,
+        "drifted": true
+      },
+      "growing_season_temp_max_c_anomaly": {
+        "ks_statistic": 0.4389,
+        "ks_pvalue": 0.0,
+        "psi": 3.2365,
+        "drifted": true
+      },
+      "growing_season_precip_mm_anomaly": {
+        "ks_statistic": 0.177,
+        "ks_pvalue": 0.0802,
+        "psi": 0.3781,
+        "drifted": true
+      },
+      "years_since_2000": {
+        "ks_statistic": 1.0,
+        "ks_pvalue": 0.0,
+        "psi": 29.4885,
+        "drifted": true
+      },
+      "crop_year_rank": {
+        "ks_statistic": 0.9091,
+        "ks_pvalue": 0.0,
+        "psi": 21.8323,
+        "drifted": true
+      },
+      "country_encoded": {
+        "ks_statistic": 0.0636,
+        "ks_pvalue": 0.9794,
+        "psi": 1.5236,
+        "drifted": true
+      }
+    },
+    "reference_period": "2000-2018",
+    "current_period": "2019-2024",
+    "timestamp": "2026-04-15T08:50:11.891397"
+  },
+  "model_drift": {
+    "crop": "Avocados",
+    "drift_detected": true,
+    "reference_mae": 0.0049,
+    "current_mae": 0.3529,
+    "degradation_pct": 7164.16,
+    "threshold_pct": 15.0,
+    "action_required": true,
+    "timestamp": "2026-04-15T08:50:11.936982"
+  },
+  "action_required": true,
+  "timestamp": "2026-04-15T08:50:11.937416"
+}
